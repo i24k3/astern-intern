@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Birthday Clock</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: lightslategrey;
+      color: black;
+      margin: 0;
+      font-family: helvetica;
+      text-align: center;
+      text-decoration: overline;
+    }
+
+    h1 {
+      font-size: 3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 id="ageDisplay">Loading...</h1>
+
+  <script>
+    // Function to calculate age difference from DOB
+    function calculateAge(birthDate) {
+      const now = new Date();
+      let years = now.getFullYear() - birthDate.getFullYear();
+      let months = now.getMonth() - birthDate.getMonth();
+      let days = now.getDate() - birthDate.getDate();
+      let hours = now.getHours() - birthDate.getHours();
+      let minutes = now.getMinutes() - birthDate.getMinutes();
+      let seconds = now.getSeconds() - birthDate.getSeconds();
+
+      if (seconds < 0) {
+        seconds += 60;
+        minutes--;
+      }
+      if (minutes < 0) {
+        minutes += 60;
+        hours--;
+      }
+      if (hours < 0) {
+        hours += 24;
+        days--;
+      }
+      if (days < 0) {
+        const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += lastMonth.getDate();
+        months--;
+      }
+      if (months < 0) {
+        months += 12;
+        years--;
+      }
+
+      return {years, months, days, hours, minutes, seconds};
+    }
+
+    // Prompt for date of birth
+    const dob = prompt("What's your date of birth in ddmmyy format?");
+    if (dob) {
+      // Convert user input into a Date object
+      const day = parseInt(dob.slice(0, 2), 10);
+      const month = parseInt(dob.slice(2, 4), 10) - 1; // Month is 0-based
+      const year = 2000 + parseInt(dob.slice(4, 6), 10); // Assuming 2000s
+
+      const birthDate = new Date(year, month, day);
+
+      // Update age every second
+      function updateAge() {
+        const age = calculateAge(birthDate);
+        const ageString = `${age.years}y :${age.months}m :${age.days}d :${age.hours}h :${age.minutes}m :${age.seconds}s`;
+        document.getElementById('ageDisplay').innerText = ageString;
+      }
+
+      setInterval(updateAge, 1000); // Update every second
+    }
+  </script>
+</body>
+
+</html>
