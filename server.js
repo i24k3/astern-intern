@@ -43,6 +43,11 @@ const parseHeaders = (rawHeaders) => {
 };
 
 
+const errorPage = (socket) => {
+        const f = fs.readFileSync('./public/error.html');
+        socket.write('HTTP/1.0 200 OK\r\n' + 'Content-Type: text/html\r\n' + '\r\n');
+        socket.write(f);
+};
 
 const cleanUp = (socket, request) => {
   socket.end();
@@ -56,12 +61,8 @@ const cleanUp = (socket, request) => {
 const processResponse = (request, socket) => {
   if (request.fetchMethod === "GET") {
     const reqPath = path.join(request.path) === "/" ? "/index.html": request.path;
-
     const staticPath = path.join("./", "public", reqPath);
-    console.log('static path : ' , staticPath);
-
     const fileExists = fs.existsSync(staticPath);
-    console.log(fileExists);
 
     if(fileExists){
       const file = fs.readFileSync(staticPath);
@@ -71,17 +72,11 @@ const processResponse = (request, socket) => {
     }
 
     switch (request.path) {
-      case '/':
-        main(socket);
-        cleanUp(socket, request);
-        break;
-
   /*
       case '/img':
         socket.write('HTTP/1.0 200 OK\r\n' + `Content-Type: ${mime.getType("./public/img.jpg")}\r\n` + '\r\n');
 
         const url  = path.join('public',request.path);
-        console.log(`url ${url}`);
 
         socket.write(image);
         cleanUp(socket, request);
@@ -106,7 +101,6 @@ const processResponse = (request, socket) => {
       case '/img':
         const image = fs.readFileSync('img.jpg');
         socket.write('HTTP/1.0 200 OK\r\n' + `Content-Type: ${mime.getType("img.jpg")}\r\n` + '\r\n');
-        console.log(mime.getType('img.jpg'))
         socket.write(image);
         cleanUp(socket, request);
         break;
@@ -124,11 +118,7 @@ const processResponse = (request, socket) => {
 */
 
       default:
-        const f = fs.readFileSync('./public/error.html');
-        socket.write('HTTP/1.0 200 OK\r\n' + 'Content-Type: text/html\r\n' + '\r\n');
-        socket.write(f);
-
-        //error(socket);
+        errorPage(socket);
         cleanUp(socket, request);
     }
   } else if (request.fetchMethod === "POST") {
@@ -136,7 +126,6 @@ const processResponse = (request, socket) => {
     switch (request.path) {
       case '/image':
         const len = request.headers['content-length'];
-        console.log(len);
         socket.write('HTTP/1.0 200 OK\r\n' + 'Content-Type: text/html\r\n' + '\r\n');
         socket.write(`
 <html>
@@ -147,7 +136,6 @@ const processResponse = (request, socket) => {
 </body>
 </html>
 `);
-        console.log(request.body);
 
         break;
 
