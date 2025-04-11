@@ -49,12 +49,6 @@ const cleanUp = (socket, request) => {
   request = { ...requestInitialValue };
 };
 
-
-const filePath = (request)=> {
-  const filename = path.basename(request.path)
-  console.log(filename);
-}
-
 /**
  * @param {{body: string, headers: Record<string, string | number> & {"content-length": number}, fetchMethod: "GET" | "POST" | "DELETE" | "PUT", path: string}} request
  * @param {net.Socket} socket
