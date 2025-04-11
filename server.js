@@ -61,9 +61,14 @@ const filePath = (request)=> {
  **/
 const processResponse = (request, socket) => {
   if (request.fetchMethod === "GET") {
-    const reqPath = request.path === "/" ? "/index.html": request.path;
+    const reqPath = path.join(request.path) === "/" ? "/index.html": request.path;
+
     const staticPath = path.join("./", "public", reqPath);
+    console.log('static path : ' , staticPath);
+
     const fileExists = fs.existsSync(staticPath);
+    console.log(fileExists);
+
     if(fileExists){
       const file = fs.readFileSync(staticPath);
       socket.write('HTTP/1.0 200 OK\r\n' + `Content-Type: ${mime.getType(staticPath)}\r\nContent-Length: ${file.length}\r\n\r\n`);
