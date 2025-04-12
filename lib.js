@@ -1,52 +1,50 @@
 import http from 'node:http';
-import path from 'node:path';
+import nodePath from 'node:path';
 import fs from 'node:fs';
 import mime from 'mime';
 import url from 'node:url';
 import merge from 'merge-descriptors';
 
-export function initialize(){
+export function initialize() {
 
-  const routes = {};  
+  const getRoutes = {};
+  const postRoutes = {}
 
   /*
+  '/' : function (req, res) {...}
 
-  const routes = {
-  '/' : function (req, res) {
-    // code of this 
-    }
-
-  '/abc': function (req, res) {
-   // code of abc goes here
-    }
+  '/abc': function (req, res) {...}
   }
-
-
-
-  // execute the / 
-
-  
-
   */
 
 
   //initialization
-  const lib = {get: (path, handler) => {
-    routes[path] = handler
-  /*
+  const lib = {
+    get: (path, handler) => {
+      getRoutes[path] = handler
+      /*
+    
+      localhost:3000/ => {/: (req,res)}
+      localhost:3000/abc/ => {/abc: (req, res)}
+    
+      */
+    },
+    post: (path, handler) => {
+      postRoutes[path] = handler;
 
-  localhost:3000/ => {/: (req,res)}
-  localhost:3000/abc/ => {/abc: (req, res)}
-
-  */
-  }};
+    }
+  };
 
   const server = http.createServer((req, res) => {
 
-    if(req.method === "GET"){
-      console.log('the req.url', req.url);
+    if (req.method === "GET") {
 
-      routes[url.parse(req.url).path](req,res);
+      const handler = getRoutes[url.parse(req.url).path];
+      typeof handler === "function" && handler(req, res);
+
+    } else if (req.method === "POST") {
+      const handler = postRoutes[url.parse(req.url).path]
+      typeof handler === "function" && handler(req, res);
     }
 
   })
@@ -60,8 +58,8 @@ export function initialize(){
   **/
 export function staticRouter(req, res) {
   const reqUrl = url.parse(req.url);
-  const reqPath = path.join(reqUrl.pathname === "/" ? "/index.html" : reqUrl.pathname);
-  const staticPath = path.join("./", "public", reqPath);
+  const reqPath = nodePath.join(reqUrl.pathname === "/" ? "/index.html" : reqUrl.pathname);
+  const staticPath = nodePath.join("./", "public", reqPath);
   const fileExists = fs.existsSync(staticPath);
 
   if (fileExists) {
