@@ -6,13 +6,49 @@ import url from 'node:url';
 import merge from 'merge-descriptors';
 
 export function initialize(){
+
+  const routes = {};  
+
+  /*
+
+  const routes = {
+  '/' : function (req, res) {
+    // code of this 
+    }
+
+  '/abc': function (req, res) {
+   // code of abc goes here
+    }
+  }
+
+
+
+  // execute the / 
+
+  
+
+  */
+
+
   //initialization
   const lib = {get: (path, handler) => {
-    console.log("adding get handler to path", path)
+    routes[path] = handler
+  /*
+
+  localhost:3000/ => {/: (req,res)}
+  localhost:3000/abc/ => {/abc: (req, res)}
+
+  */
   }};
 
   const server = http.createServer((req, res) => {
-    //code
+
+    if(req.method === "GET"){
+      console.log('the req.url', req.url);
+
+      routes[url.parse(req.url).path](req,res);
+    }
+
   })
 
   return merge(server, lib);
