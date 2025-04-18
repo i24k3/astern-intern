@@ -26,21 +26,25 @@ export function initialize() {
 
     let lastMatchedIdx = -1;
     const currentPath = url.parse(req.url)?.path;
-    const currentMethod = req.method;
 
     function next() {
-      const handlerFn = routes.find((route, i) => {
-        const methodPtrn = match(route.pattern)
-        const methodPtrnStatus = methodPtrn(currentPath);
+      const matchedRoute = routes.find((route, i) => {
+        const matchingFn = match(route.pattern)
+        const matchingResult = matchingFn(currentPath);
 
-        if (methodPtrnStatus && route.method === req.method && i > lastMatchedIdx) {
+        if (matchingResult && route.method === req.method && i > lastMatchedIdx) {
           lastMatchedIdx = i;
           return true;
         }
         else return false;
 
       });
-    handlerFn.handler(req, res, next);
+
+      const matchingFn = match(matchedRoute.pattern)
+      const matchingResult = matchingFn(currentPath);
+
+      req.params = matchingResult.params;
+      matchedRoute.handler(req, res, next);
 
     }
     next();
